@@ -52,6 +52,22 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  fonts:
+    - family: xanhMono
+      fonts:
+        - asset: assets\fonts\XanhMono-Regular.ttf
+    - family: thorn
+      fonts:
+        - asset: assets\fonts\Thorn-4Bn19.ttf
+    - family: monoton
+      fonts:
+        - asset: assets/fonts/Monoton-Regular.ttf
+    - family: BigShoulder
+      fonts:
+        - asset: assets/fonts/BigShouldersInlineText-VariableFont_wght.ttf
+    - family: xeno
+      fonts:
+        - asset: assets/fonts/XenophobiaNominal-RAxA.ttf
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
