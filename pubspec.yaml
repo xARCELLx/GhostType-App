@@ -68,7 +68,15 @@ flutter:
     - family: xeno
       fonts:
         - asset: assets/fonts/XenophobiaNominal-RAxA.ttf
-
+    - family: poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+    - family: poppins-light
+      fonts:
+        - asset: assets/fonts/Poppins-Light.ttf
+    - family: orbitron
+      fonts:
+        - asset: assets/fonts/Orbitron-VariableFont_wght.ttf
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
