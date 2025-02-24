@@ -49,7 +49,7 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
       CurvedAnimation(parent: _glassController, curve: Curves.easeOutBack),
     );
 
-    SchedulerBinding.instance.addPostFrameCallback((_) {
+    Future.delayed(Duration.zero, () {
       if (mounted) {
         _formController.forward();
         _glassController.forward();
@@ -68,30 +68,35 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
   }
 
   void _submit() {
-    // sign up logic
+    // Placeholder for signup logic (implement as needed)
   }
 
   @override
   Widget build(BuildContext context) {
+    // Use MediaQuery to dynamically adjust based on screen orientation and size
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
+    // Use Scaffold with resizeToAvoidBottomInset to handle keyboard overflow
     return Scaffold(
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: true, // Automatically adjust for keyboard
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Cosmic background
+          // Cosmic background (already optimized in SplashScreen)
           GhostTypeSplashScreen(
             enableNavigation: false,
             presetTextItems: widget.initialTextItems,
             initialTextStates: widget.initialTextStates,
             initialFloatOffsets: widget.initialFloatOffsets,
           ),
-          // Glassmorphism overlay
+          // Glassmorphism overlay with subtle blur for modern aesthetic
           AnimatedBuilder(
             animation: _blurAnimation,
             builder: (context, child) {
               return BackdropFilter(
                 filter: ImageFilter.blur(
-                  sigmaX: _blurAnimation.value,
+                  sigmaX: _blurAnimation.value, // Optimized blur for performance
                   sigmaY: _blurAnimation.value,
                 ),
                 child: Container(
@@ -100,54 +105,68 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
               );
             },
           ),
-          // Form container with modern, aesthetic design
-          Padding(
-            padding: const EdgeInsets.only(top: 60, left: 20, right: 20),
-            child: ScaleTransition(
-              scale: _scaleAnimation,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Welcome text with cosmic glow
-                  Text(
-                    'Welcome to',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 25,
-                      shadows: [
-                        Shadow(
-                          blurRadius: 12,
-                          color: Colors.blueAccent.withOpacity(0.4),
-                          offset: const Offset(0, 0),
+          // Use SingleChildScrollView to handle overflow in both vertical (keyboard) and horizontal (cropping) layouts
+          SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20), // Responsive padding
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start, // Maintain top-left alignment for welcome text
+              children: [
+                // Welcome text at top left, outside the centered form
+                Padding(
+                  padding: const EdgeInsets.only(left: 0, top: 30), // Adjust padding for top-left positioning
+                  child: ScaleTransition(
+                    scale: _scaleAnimation,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Welcome to',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 25,
+                            shadows: [
+                              Shadow(
+                                blurRadius: 12,
+                                color: Colors.blueAccent.withOpacity(0.4),
+                                offset: const Offset(0, 0),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          'GhostType',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 35,
+                            shadows: [
+                              Shadow(
+                                blurRadius: 12,
+                                color: Colors.blueAccent.withOpacity(0.4),
+                                offset: const Offset(0, 0),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  Text(
-                    'GhostType',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 35,
-                      shadows: [
-                        Shadow(
-                          blurRadius: 12,
-                          color: Colors.blueAccent.withOpacity(0.4),
-                          offset: const Offset(0, 0),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 60),
-                  // Form card with glassmorphism and gradients
-                  SingleChildScrollView(
-
+                ),
+                const SizedBox(height: 75), // Space between welcome text and centered form
+                // Centered form container with modern, aesthetic design, now responsive to screen orientation
+                Center(
+                  child: ScaleTransition(
+                    scale: _scaleAnimation, // Maintain smooth form entrance animation
                     child: Container(
-
                       padding: const EdgeInsets.all(24.0),
+                      // Dynamic width based on screen orientation and size for responsiveness
+                      constraints: BoxConstraints(
+                        maxWidth: isLandscape ? screenWidth * 0.8 : 400, // 80% of screen width in landscape, 400px in portrait
+                        maxHeight: double.infinity, // Allow flexible height for scrolling
+                      ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20.0),
                         border: Border.all(color: Colors.white.withOpacity(0.1), width: 0.5),
@@ -171,7 +190,7 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
                       child: Form(
                         key: _formKey,
                         child: Column(
-                          mainAxisSize: MainAxisSize.min,
+                          mainAxisSize: MainAxisSize.min, // Minimize height for centering and scrolling
                           children: [
                             Text(
                               'Create an Account',
@@ -188,6 +207,7 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
                                   ),
                                 ],
                               ),
+                              textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 30),
                             // Email field
@@ -277,8 +297,8 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
@@ -295,7 +315,7 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
     String? Function(String?)? validator,
   }) {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300), // Smooth transition for performance
       child: TextFormField(
         controller: controller,
         obscureText: obscureText,
@@ -339,9 +359,7 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
           onTap: onTap,
           borderRadius: BorderRadius.circular(15.0),
           onHover: (hovering) {
-            setState(() {
-              // No state change needed, animation handles it
-            });
+            // No state change needed, animation handles it
           },
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 24.0),
