@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:ghost_type/custom_app/screens/SplashScreen.dart';
+import 'package:ghost_type/custom_app/services/SignUpScreen_service.dart';
 
 class SignUpScreen extends StatefulWidget {
   final List<MorphingTextData>? initialTextItems;
@@ -67,8 +68,32 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
     super.dispose();
   }
 
-  void _submit() {
-    // Placeholder for signup logic (implement as needed)
+  void _submit()async {
+    // Placeholder for signup logic
+    if(_formKey.currentState!.validate()){
+      try{
+
+        final success=await SignUpService.signUp(
+            email: _emailController.text.toString(), username: _usernameController.text.toString(), password: _passwordController.text.toString()
+        );
+
+        if (success) {
+          // Handle successful signup (e.g., navigate to home screen or show success message)
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Signup successful!')),
+          );
+          // Optionally, navigate to another screen
+          // Navigator.pushReplacementNamed(context, '/home');
+        }
+
+      } catch (e) {
+        // Handle errors from the API (e.g., network issues, invalid data)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Signup failed: $e')),
+        );
+      }
+    }
+
   }
 
   @override
@@ -280,7 +305,7 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
                             TextButton(
                               onPressed: () {
                                 // Navigate to login screen (implement as needed)
-                                Navigator.pushNamed(context, '/login');
+
                               },
                               child: Text(
                                 'Already have an account? Log In',
