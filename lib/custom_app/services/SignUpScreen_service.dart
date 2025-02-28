@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class SignUpService {
-  static const String baseUrl = "http://127.0.0.1:8000/auth/register/";
+  static const String baseUrl = "http://192.168.42.156:8000/auth/register/";
 
   static Future<bool> signUp({
     required String email,
@@ -27,14 +27,12 @@ class SignUpService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return true;
-      } else if (response.statusCode == 400 || response.statusCode == 409) {
+      } else{
         final error = jsonDecode(response.body);
-        throw Exception('Signup failed: ${error['message'] ?? 'Error occurred'}');
-      } else {
-        throw Exception('Signup failed with status: ${response.statusCode}');
+        throw Exception(error['message']);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw Exception(e.toString());
     }
   }
 }

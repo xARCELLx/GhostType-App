@@ -88,7 +88,9 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
 
       } catch (e) {
         // Handle errors from the API (e.g., network issues, invalid data)
+        print(e.toString());
         ScaffoldMessenger.of(context).showSnackBar(
+
           SnackBar(content: Text('Signup failed: $e')),
         );
       }
