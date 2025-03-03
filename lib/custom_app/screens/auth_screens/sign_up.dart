@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
-import 'package:ghost_type/custom_app/providers/auth_provider.dart'; // Updated import
+import 'package:ghost_type/custom_app/providers/auth_provider.dart';
 import 'package:ghost_type/custom_app/screens/SplashScreen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -26,7 +26,7 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
   late Animation<double> _scaleAnimation;
   late AnimationController _glassController;
   late Animation<double> _blurAnimation;
-  late AnimationController _loadingController; // For button loading animation
+  late AnimationController _loadingController;
 
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
@@ -53,7 +53,6 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
       CurvedAnimation(parent: _glassController, curve: Curves.easeOutBack),
     );
 
-    // Initialize loading animation controller for button (1.5s duration, pulsing effect)
     _loadingController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
@@ -80,394 +79,379 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
 
   void _submit(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
-      // Access AuthProvider to perform signup
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      _loadingController.repeat(reverse: true); // Start loading animation
+      _loadingController.repeat(reverse: true);
 
-      await authProvider.SignUp(
+      await authProvider.signUp(
         email: _emailController.text,
         username: _usernameController.text,
         password: _passwordController.text,
       );
 
-      // Handle signup result
       if (authProvider.isSignedUp) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Signup successful!')),
+          const SnackBar(content: Text('Signup successful! Please log in.')),
         );
-        // Optionally, navigate to another screen
-        // Navigator.pushReplacementNamed(context, '/home');
-      } else if (authProvider.errorMessages != null) {
+        // Navigate to LoginScreen after successful signup
+        Navigator.pushReplacementNamed(context, '/login');
+      } else if (authProvider.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(authProvider.errorMessages!)),
+          SnackBar(content: Text(authProvider.errorMessage!)),
         );
       }
 
-      _loadingController.stop(); // Stop loading animation
+      _loadingController.stop();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Use MediaQuery to dynamically adjust based on screen orientation and size
     final screenWidth = MediaQuery.of(context).size.width;
     final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
-    // Use Consumer to listen to AuthProvider changes (e.g., loading state, errors)
     return Consumer<AuthProvider>(
-        builder: (context, authProvider, child) {
-          return Scaffold(
-            resizeToAvoidBottomInset: true, // Automatically adjust for keyboard
-            body: Stack(
-              fit: StackFit.expand,
-              children: [
-                // Cosmic background
-                GhostTypeSplashScreen(
-                  enableNavigation: false,
-                  presetTextItems: widget.initialTextItems,
-                  initialTextStates: widget.initialTextStates,
-                  initialFloatOffsets: widget.initialFloatOffsets,
-                ),
-                // Glassmorphism overlay
-                AnimatedBuilder(
-                  animation: _blurAnimation,
-                  builder: (context, child) {
-                    return BackdropFilter(
-                      filter: ImageFilter.blur(
-                        sigmaX: _blurAnimation.value,
-                        sigmaY: _blurAnimation.value,
-                      ),
-                      child: Container(
-                        color: Colors.black.withOpacity(0.05), // Subtle overlay for glass effect
-                      ),
-                    );
-                  },
-                ),
-                // Use SingleChildScrollView to handle overflow in both vertical (keyboard) and horizontal (cropping) layouts
-                SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20), // Responsive padding
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start, // Maintain top-left alignment for welcome text
-                    children: [
-                      // Welcome text at top left, outside the centered form
-                      Padding(
-                        padding: const EdgeInsets.only(left: 0, top: 20), // Adjust padding for top-left positioning
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Welcome to',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.bold,
-                                fontSize: 25,
-                                shadows: [
-                                  Shadow(
-                                    blurRadius: 12,
-                                    color: Colors.blueAccent.withOpacity(0.4),
-                                    offset: const Offset(0, 0),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Text(
-                              'GhostType',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.bold,
-                                fontSize: 35,
-                                shadows: [
-                                  Shadow(
-                                    blurRadius: 12,
-                                    color: Colors.blueAccent.withOpacity(0.4),
-                                    offset: const Offset(0, 0),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 60), // Space between welcome text and centered form
-                      // Centered form container with modern, aesthetic design, now responsive to screen orientation
-                      Center(
-                        child: ScaleTransition(
-                          scale: _scaleAnimation, // Maintain smooth form entrance animation
-                          child: Container(
-                            padding: const EdgeInsets.all(24.0),
-                            // Dynamic width based on screen orientation and size for responsiveness
-                            constraints: BoxConstraints(
-                              maxWidth: isLandscape ? screenWidth * 0.8 : 400, // 80% of screen width in landscape, 400px in portrait
-                              maxHeight: double.infinity, // Allow flexible height for scrolling
-                            ),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20.0),
-                              border: Border.all(color: Colors.white.withOpacity(0.1), width: 0.5),
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Colors.cyan.withOpacity(0.1),
-                                  Colors.purple.withOpacity(0.1),
-                                ],
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.blueAccent.withOpacity(0.2),
-                                  blurRadius: 20.0,
-                                  spreadRadius: -5.0,
-                                  offset: const Offset(0, 8),
+      builder: (context, authProvider, child) {
+        return Scaffold(
+          resizeToAvoidBottomInset: true,
+          body: Stack(
+            fit: StackFit.expand,
+            children: [
+              GhostTypeSplashScreen(
+                enableNavigation: false,
+                presetTextItems: widget.initialTextItems,
+                initialTextStates: widget.initialTextStates,
+                initialFloatOffsets: widget.initialFloatOffsets,
+              ),
+              AnimatedBuilder(
+                animation: _blurAnimation,
+                builder: (context, child) {
+                  return BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: _blurAnimation.value,
+                      sigmaY: _blurAnimation.value,
+                    ),
+                    child: Container(
+                      color: Colors.black.withOpacity(0.05),
+                    ),
+                  );
+                },
+              ),
+              SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 0, top: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Welcome to',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 25,
+                              shadows: [
+                                Shadow(
+                                  blurRadius: 12,
+                                  color: Colors.blueAccent.withOpacity(0.4),
+                                  offset: const Offset(0, 0),
                                 ),
                               ],
                             ),
-                            child: Form(
-                              key: _formKey,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min, // Minimize height for centering and scrolling
-                                children: [
-                                  Text(
-                                    'Create an Account',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: 'Poppins',
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                      shadows: [
-                                        Shadow(
-                                          blurRadius: 12,
-                                          color: Colors.blueAccent.withOpacity(0.4),
-                                          offset: const Offset(0, 0),
-                                        ),
-                                      ],
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  const SizedBox(height: 30),
-                                  // Email field
-                                  _buildInputField(
-                                    controller: _emailController,
-                                    label: 'Email Address',
-                                    icon: Icons.email,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please enter your email';
-                                      }
-                                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                                        return 'Please enter a valid email';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  const SizedBox(height: 16.0),
-                                  // Username field
-                                  _buildInputField(
-                                    controller: _usernameController,
-                                    label: 'Username',
-                                    icon: Icons.person,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please enter your username';
-                                      }
-                                      if (value.length < 3) {
-                                        return 'Username must be at least 3 characters';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  const SizedBox(height: 16.0),
-                                  // Password field
-                                  _buildInputField(
-                                    controller: _passwordController,
-                                    label: 'Password',
-                                    icon: Icons.lock,
-                                    obscureText: _isObscure,
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _isObscure ? Icons.visibility : Icons.visibility_off,
-                                        color: Colors.white.withOpacity(0.7),
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          _isObscure = !_isObscure;
-                                        });
-                                      },
-                                    ),
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please enter your password';
-                                      }
-                                      if (value.length < 6) {
-                                        return 'Password must be at least 6 characters';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  const SizedBox(height: 24.0),
-                                  // Sign Up button
-                                  _buildButton(
-                                    text: 'Sign Up',
-                                    onTap: () => _submit(context), // Pass context to _submit
-                                    isLoading: authProvider.isLoading,
-                                  ),
-                                  const SizedBox(height: 16.0),
-                                  // Login redirect
-                                  TextButton(
-                                    onPressed: () {
-                                      // Navigate to login screen (implement as needed)
-                                      Navigator.pushNamed(context, '/login');
-                                    },
-                                    child: Text(
-                                      'Already have an account? Log In',
-                                      style: TextStyle(
-                                        fontSize: 14.0,
-                                        fontFamily: 'Poppins',
-                                        color: Colors.white.withOpacity(0.7),
-                                        decoration: TextDecoration.underline,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                          ),
+                          Text(
+                            'GhostType',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 35,
+                              shadows: [
+                                Shadow(
+                                  blurRadius: 12,
+                                  color: Colors.blueAccent.withOpacity(0.4),
+                                  offset: const Offset(0, 0),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 60),
+                    Center(
+                      child: ScaleTransition(
+                        scale: _scaleAnimation,
+                        child: Container(
+                          padding: const EdgeInsets.all(24.0),
+                          constraints: BoxConstraints(
+                            maxWidth: isLandscape ? screenWidth * 0.8 : 400,
+                            maxHeight: double.infinity,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20.0),
+                            border: Border.all(color: Colors.white.withOpacity(0.1), width: 0.5),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.cyan.withOpacity(0.1),
+                                Colors.purple.withOpacity(0.1),
+                              ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.blueAccent.withOpacity(0.2),
+                                blurRadius: 20.0,
+                                spreadRadius: -5.0,
+                                offset: const Offset(0, 8),
                               ),
+                            ],
+                          ),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Create an Account',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                    shadows: [
+                                      Shadow(
+                                        blurRadius: 12,
+                                        color: Colors.blueAccent.withOpacity(0.4),
+                                        offset: const Offset(0, 0),
+                                      ),
+                                    ],
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 30),
+                                _buildInputField(
+                                  controller: _emailController,
+                                  label: 'Email Address',
+                                  icon: Icons.email,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your email';
+                                    }
+                                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                                      return 'Please enter a valid email';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 16.0),
+                                _buildInputField(
+                                  controller: _usernameController,
+                                  label: 'Username',
+                                  icon: Icons.person,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your username';
+                                    }
+                                    if (value.length < 3) {
+                                      return 'Username must be at least 3 characters';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 16.0),
+                                _buildInputField(
+                                  controller: _passwordController,
+                                  label: 'Password',
+                                  icon: Icons.lock,
+                                  obscureText: _isObscure,
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _isObscure ? Icons.visibility : Icons.visibility_off,
+                                      color: Colors.white.withOpacity(0.7),
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _isObscure = !_isObscure;
+                                      });
+                                    },
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your password';
+                                    }
+                                    if (value.length < 6) {
+                                      return 'Password must be at least 6 characters';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 24.0),
+                                _buildButton(
+                                  text: 'Sign Up',
+                                  onTap: () => _submit(context),
+                                  isLoading: authProvider.isLoading,
+                                ),
+                                const SizedBox(height: 16.0),
+                                TextButton(
+                                  onPressed: () {
+                                    // Navigate to login screen when "Already have an account" is tapped
+                                    Navigator.pushReplacementNamed(context, '/login');
+                                  },
+                                  child: Text(
+                                    'Already have an account? Log In',
+                                    style: TextStyle(
+                                      fontSize: 14.0,
+                                      fontFamily: 'Poppins',
+                                      color: Colors.white.withOpacity(0.7),
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          );
-        },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
-        Widget _buildInputField({
+  Widget _buildInputField({
     required TextEditingController controller,
     required String label,
     required IconData icon,
     bool obscureText = false,
     Widget? suffixIcon,
     String? Function(String?)? validator,
-    }) {
-      return AnimatedContainer(
-        duration: const Duration(milliseconds: 300), // Smooth transition for performance
-        child: TextFormField(
-          controller: controller,
-          obscureText: obscureText,
-          decoration: InputDecoration(
-            labelText: label,
-            prefixIcon: Icon(icon, color: Colors.white.withOpacity(0.7)),
-            suffixIcon: suffixIcon,
-            labelStyle: TextStyle(
-              color: Colors.white.withOpacity(0.7),
-              fontFamily: 'Poppins',
-              fontSize: 16.0,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15.0),
-              borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15.0),
-              borderSide: BorderSide(color: Colors.blueAccent, width: 2.0),
-            ),
-            filled: true,
-            fillColor: Colors.black.withOpacity(0.1), // Glass-like fill
-          ),
-          style: TextStyle(
-            color: Colors.white,
+  }) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      child: TextFormField(
+        controller: controller,
+        obscureText: obscureText,
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: Icon(icon, color: Colors.white.withOpacity(0.7)),
+          suffixIcon: suffixIcon,
+          labelStyle: TextStyle(
+            color: Colors.white.withOpacity(0.7),
             fontFamily: 'Poppins',
             fontSize: 16.0,
           ),
-          validator: validator,
-        ),
-      );
-    }
-
-    Widget _buildButton({
-      required String text,
-      required VoidCallback onTap,
-      required bool isLoading,
-    }) {
-      return AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        child: Material(
-          borderRadius: BorderRadius.circular(15.0),
-          elevation: 4.0,
-          child: InkWell(
-            onTap: isLoading ? null : onTap, // Disable tap while loading
+          enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15.0),
-            onHover: (hovering) {
-              // No state change needed, animation handles it
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 24.0),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    Colors.cyan.withOpacity(isLoading ? 0.5 : 0.8), // Dim gradient when loading
-                    Colors.purple.withOpacity(isLoading ? 0.5 : 0.8),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(15.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.blueAccent.withOpacity(0.3),
-                    blurRadius: 10.0,
-                    spreadRadius: -2.0,
-                    offset: const Offset(0, 4),
-                  ),
+            borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15.0),
+            borderSide: BorderSide(color: Colors.blueAccent, width: 2.0),
+          ),
+          filled: true,
+          fillColor: Colors.black.withOpacity(0.1),
+        ),
+        style: TextStyle(
+          color: Colors.white,
+          fontFamily: 'Poppins',
+          fontSize: 16.0,
+        ),
+        validator: validator,
+      ),
+    );
+  }
+
+  Widget _buildButton({
+    required String text,
+    required VoidCallback onTap,
+    required bool isLoading,
+  }) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      child: Material(
+        borderRadius: BorderRadius.circular(15.0),
+        elevation: 4.0,
+        child: InkWell(
+          onTap: isLoading ? null : onTap,
+          borderRadius: BorderRadius.circular(15.0),
+          onHover: (hovering) {
+            // No state change needed, animation handles it
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 24.0),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  Colors.cyan.withOpacity(isLoading ? 0.5 : 0.8),
+                  Colors.purple.withOpacity(isLoading ? 0.5 : 0.8),
                 ],
               ),
-              child: Center(
-                child: isLoading
-                    ? AnimatedBuilder(
-                  animation: _loadingController,
-                  builder: (context, child) {
-                    final double opacity = 0.5 + 0.5 * sin(_loadingController.value * 2 * pi);
-                    return Text(
-                      'Loading...',
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white.withOpacity(opacity), // Pulsing opacity effect
-                        shadows: [
-                          Shadow(
-                            blurRadius: 8,
-                            color: Colors.blueAccent.withOpacity(0.3),
-                            offset: const Offset(0, 0),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                )
-                    : Text(
-                  text,
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    shadows: [
-                      Shadow(
-                        blurRadius: 8,
-                        color: Colors.blueAccent.withOpacity(0.3),
-                        offset: const Offset(0, 0),
-                      ),
-                    ],
-                  ),
+              borderRadius: BorderRadius.circular(15.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.blueAccent.withOpacity(0.3),
+                  blurRadius: 10.0,
+                  spreadRadius: -2.0,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Center(
+              child: isLoading
+                  ? AnimatedBuilder(
+                animation: _loadingController,
+                builder: (context, child) {
+                  final double opacity = 0.5 + 0.5 * sin(_loadingController.value * 2 * pi);
+                  return Text(
+                    'Loading...',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white.withOpacity(opacity),
+                      shadows: [
+                        Shadow(
+                          blurRadius: 8,
+                          color: Colors.blueAccent.withOpacity(0.3),
+                          offset: const Offset(0, 0),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              )
+                  : Text(
+                text,
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  shadows: [
+                    Shadow(
+                      blurRadius: 8,
+                      color: Colors.blueAccent.withOpacity(0.3),
+                      offset: const Offset(0, 0),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
         ),
-      );
-    }
+      ),
+    );
   }
+}

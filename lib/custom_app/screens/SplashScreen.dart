@@ -42,7 +42,7 @@ class _GhostTypeSplashScreenState extends State<GhostTypeSplashScreen> with Tick
 
     _spaceController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 25), // Slow cosmic drift
+      duration: const Duration(seconds: 20), // Slow cosmic drift
     )..repeat(reverse: true);
     _nebulaAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _spaceController, curve: Curves.easeInOut),
