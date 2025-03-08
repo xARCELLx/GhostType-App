@@ -3,7 +3,7 @@ import '../services/LoginService.dart';
 import '../services/SignUpScreen_service.dart';
 
 class AuthProvider with ChangeNotifier {
-  bool _isLoading = false;
+  bool _isLoading = LoginService.getAuthToken()!=null;
   String? _errorMessage;
   bool _isSignedUp = false;
   bool _isLoggedIn = false;

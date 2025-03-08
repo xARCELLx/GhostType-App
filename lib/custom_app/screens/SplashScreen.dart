@@ -64,13 +64,13 @@ class _GhostTypeSplashScreenState extends State<GhostTypeSplashScreen> with Tick
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) {
                 if(Provider.of<AuthProvider>(context, listen: false).isLoggedIn) {
-                  return SignUpScreen(
-                    initialTextItems: textItems,
-                    initialTextStates: currentStates,
-                    initialFloatOffsets: currentOffsets,
-                  );
+                  return HomeScreen();
                 }
-                return HomeScreen();
+                return SignUpScreen(
+                  initialTextItems: textItems,
+                  initialTextStates: currentStates,
+                  initialFloatOffsets: currentOffsets,
+                );
             },
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 return FadeTransition(opacity: animation, child: child);
