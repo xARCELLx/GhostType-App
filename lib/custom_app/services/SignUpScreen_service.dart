@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class SignUpService {
-  static const String baseUrl = "http://192.168.42.156:8000/auth/register/";
+  static const String baseUrl = "http://192.168.151.156:8000/auth/register/";
 
   static Future<bool> signUp({
     required String email,

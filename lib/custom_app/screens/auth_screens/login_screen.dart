@@ -90,6 +90,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
           const SnackBar(content: Text('Login successful!')),
         );
         // Navigate to home screen or dashboard
+        Navigator.pushReplacementNamed(context, '/home');
         // Navigator.pushReplacementNamed(context, '/home');
       } else if (authProvider.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(

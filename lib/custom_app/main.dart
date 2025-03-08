@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ghost_type/custom_app/screens/Home_Screen.dart';
 import 'package:provider/provider.dart';
 import 'package:ghost_type/custom_app/providers/auth_provider.dart';
 import 'package:ghost_type/custom_app/screens/SplashScreen.dart';
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/signup': (context) => const SignUpScreen(),
         '/login': (context) => const LoginScreen(),
+        '/home': (context)=> const HomeScreen()
       },
     );
   }

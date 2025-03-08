@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:ghost_type/custom_app/screens/Home_Screen.dart';
 import 'package:ghost_type/custom_app/screens/auth_screens/sign_up.dart';
+import 'package:ghost_type/custom_app/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class GhostTypeSplashScreen extends StatefulWidget {
   final bool enableNavigation;
@@ -59,11 +62,16 @@ class _GhostTypeSplashScreenState extends State<GhostTypeSplashScreen> with Tick
               .toList();
           Navigator.of(context).pushReplacement(
             PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) => SignUpScreen(
-                initialTextItems: textItems,
-                initialTextStates: currentStates,
-                initialFloatOffsets: currentOffsets,
-              ),
+              pageBuilder: (context, animation, secondaryAnimation) {
+                if(Provider.of<AuthProvider>(context, listen: false).isLoggedIn) {
+                  return SignUpScreen(
+                    initialTextItems: textItems,
+                    initialTextStates: currentStates,
+                    initialFloatOffsets: currentOffsets,
+                  );
+                }
+                return HomeScreen();
+            },
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 return FadeTransition(opacity: animation, child: child);
               },

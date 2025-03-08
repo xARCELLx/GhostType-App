@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginService {
-  static const String baseUrl = "http://192.168.42.156:8000/auth/login/";
+  static const String baseUrl = "http://192.168.151.156:8000/auth/login/";
 
   // Login method that handles API call and saves tokens/username
   static Future<Map<String, dynamic>> login({
@@ -28,6 +28,10 @@ class LoginService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         // Save tokens and username to shared_preferences
+        print("Acces token is : "+data['access']);
+        print("Refresh token is : "+data['refresh']);
+        print(data['username']);
+        
         await _saveData(
           refresh: data['refresh'],
           authToken: data['access'],
