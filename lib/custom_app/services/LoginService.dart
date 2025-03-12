@@ -1,9 +1,11 @@
+import 'dart:ffi';
+
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginService {
-  static const String baseUrl = "http://192.168.151.156:8000/auth/login/";
+  static const String baseUrl = "http://192.168.178.156:8000/auth/login/";
 
   // Login method that handles API call and saves tokens/username
   static Future<Map<String, dynamic>> login({
@@ -36,6 +38,7 @@ class LoginService {
           refresh: data['refresh'],
           authToken: data['access'],
           username: data['username'],
+          isLogedin: true,
         );
         return data; // Return the full response
       } else {
@@ -52,11 +55,13 @@ class LoginService {
     required String refresh,
     required String authToken,
     required String username,
+    required bool isLogedin,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('refresh_token', refresh);
     await prefs.setString('auth_token', authToken);
     await prefs.setString('username', username);
+    await prefs.setBool('isLogedin',isLogedin);
   }
 
   // Clear saved data on logout
@@ -65,6 +70,7 @@ class LoginService {
     await prefs.remove('refresh_token');
     await prefs.remove('auth_token');
     await prefs.remove('username');
+    await prefs.setBool('isLogedin',false);
   }
 
   // Retrieve auth token
@@ -83,5 +89,11 @@ class LoginService {
   static Future<String?> getUsername() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('username');
+  }
+
+  static Future<bool?> getIsLoggedIn() async {
+    final prefs = await SharedPreferences.getInstance();
+    bool? value=prefs.getBool("isLogedin");
+    return value;
   }
 }

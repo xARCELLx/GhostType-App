@@ -5,6 +5,7 @@ import 'package:ghost_type/custom_app/screens/Home_Screen.dart';
 import 'package:ghost_type/custom_app/screens/auth_screens/sign_up.dart';
 import 'package:ghost_type/custom_app/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:ghost_type/custom_app/services/LoginService.dart';
 
 class GhostTypeSplashScreen extends StatefulWidget {
   final bool enableNavigation;
@@ -52,35 +53,39 @@ class _GhostTypeSplashScreenState extends State<GhostTypeSplashScreen> with Tick
     );
 
     if (widget.enableNavigation) {
-      Timer(const Duration(seconds: 5), () {
-        if (mounted) {
-          List<bool> currentStates = _textWidgetKeys
-              .map((key) => key.currentState?.showCorrect ?? false)
-              .toList();
-          List<double> currentOffsets = _textWidgetKeys
-              .map((key) => key.currentState?.currentOffset ?? 0.0)
-              .toList();
-          Navigator.of(context).pushReplacement(
-            PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) {
-                if(Provider.of<AuthProvider>(context, listen: false).isLoggedIn) {
-                  return HomeScreen();
-                }
-                return SignUpScreen(
-                  initialTextItems: textItems,
-                  initialTextStates: currentStates,
-                  initialFloatOffsets: currentOffsets,
-                );
+      Timer(const Duration(seconds: 5), () async {
+        if (!mounted) return;
+
+        List<bool> currentStates = _textWidgetKeys
+            .map((key) => key.currentState?.showCorrect ?? false)
+            .toList();
+        List<double> currentOffsets = _textWidgetKeys
+            .map((key) => key.currentState?.currentOffset ?? 0.0)
+            .toList();
+
+        bool isLoggedIn = await LoginService.getIsLoggedIn()?? false; // ✅ Await the result
+
+        if (!mounted) return; // Ensure the widget is still in the tree before navigating
+
+        Navigator.of(context).pushReplacement(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) {
+              return isLoggedIn ? HomeScreen() : SignUpScreen(
+                initialTextItems: textItems,
+                initialTextStates: currentStates,
+                initialFloatOffsets: currentOffsets,
+              );
             },
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return FadeTransition(opacity: animation, child: child);
-              },
-              transitionDuration: const Duration(milliseconds: 800),
-            ),
-          );
-        }
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 800),
+          ),
+        );
       });
     }
+
+
   }
 
   @override

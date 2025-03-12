@@ -3,7 +3,7 @@ import '../services/LoginService.dart';
 import '../services/SignUpScreen_service.dart';
 
 class AuthProvider with ChangeNotifier {
-  bool _isLoading = LoginService.getAuthToken()!=null;
+  bool _isLoading = false;
   String? _errorMessage;
   bool _isSignedUp = false;
   bool _isLoggedIn = false;
@@ -24,7 +24,6 @@ class AuthProvider with ChangeNotifier {
   // Load saved username from LoginService
   Future<void> _loadSavedData() async {
     _username = await LoginService.getUsername();
-    _isLoggedIn = (await LoginService.getAuthToken()) != null; // Consider logged in if auth token exists
     notifyListeners();
   }
 
@@ -70,6 +69,7 @@ class AuthProvider with ChangeNotifier {
       final response = await LoginService.login(
         email: email,
         password: password,
+
       );
       _isLoggedIn = true;
       _username = response['username'];
