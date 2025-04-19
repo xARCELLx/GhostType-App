@@ -7,45 +7,35 @@ class KeyboardLayout extends StatelessWidget {
 
   KeyboardLayout({super.key});
 
-  Widget _buildKey(String key) {
+  Widget _buildKey(String key, {int flex = 1}) {
     return Expanded(
+      flex: flex,
       child: Padding(
-        padding: const EdgeInsets.all(4.0),
+        padding: const EdgeInsets.all(2),
         child: Container(
-          height: 60, // Slightly taller for modern feel
+          height: 48,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.purple[900]!, Colors.blue[700]!],
+              colors: [
+                Colors.purple[800]!.withOpacity(0.15),
+                Colors.purple[500]!.withOpacity(0.05),
+              ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(12), // Softer curves
-            boxShadow: [
-              BoxShadow(
-                color: Colors.blueAccent.withOpacity(0.3),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: Colors.blueAccent.withOpacity(0.5),
-              width: 1,
+              color: Colors.purple[300]!.withOpacity(0.2),
+              width: 0.4,
             ),
           ),
           child: Center(
             child: Text(
               key,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                shadows: [
-                  Shadow(
-                    color: Colors.blueAccent,
-                    offset: Offset(0, 0),
-                    blurRadius: 6,
-                  ),
-                ],
+              style: TextStyle(
+                color: Colors.purple[100],
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
@@ -54,36 +44,60 @@ class KeyboardLayout extends StatelessWidget {
     );
   }
 
-  Widget _buildRow(List<String> keys) {
-    return Row(
-      children: keys.map(_buildKey).toList(),
+  Widget _buildRow(List<String> keys, {double horizontalPadding = 0}) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+      child: Row(
+        children: keys.map((k) => _buildKey(k)).toList(),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        _buildRow(_keysRow1),
-        const SizedBox(height: 8), // Increased spacing
-        _buildRow(_keysRow2),
-        const SizedBox(height: 8),
-        _buildRow(_keysRow3),
-        const SizedBox(height: 8),
-        Row(
+    final mediaQuery = MediaQuery.of(context);
+    final screenPaddingBottom = mediaQuery.viewPadding.bottom;
+
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: screenPaddingBottom + 10),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            _buildKey('123'),
-            _buildKey(','),
-            Expanded(
-              flex: 4,
-              child: _buildKey('Space'),
+            _buildRow(_keysRow1, horizontalPadding: 2),
+            const SizedBox(height: 6),
+            _buildRow(_keysRow2, horizontalPadding: 22),
+            const SizedBox(height: 6),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Row(
+                children: [
+                  _buildKey('⇧'),
+                  ..._keysRow3.map((k) => _buildKey(k)).toList(),
+                  _buildKey('⌫'),
+                ],
+              ),
             ),
-            _buildKey('.'),
-            _buildKey('⏎'),
+            const SizedBox(height: 6),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: Row(
+                children: [
+                  _buildKey('123'),
+                  _buildKey('🌐'),
+                  Expanded(
+                    flex: 5,
+                    child: _buildKey('Space'),
+                  ),
+                  _buildKey('.'),
+                  _buildKey('⏎'),
+                ],
+              ),
+            ),
           ],
-        )
-      ],
+        ),
+      ),
     );
   }
 }
