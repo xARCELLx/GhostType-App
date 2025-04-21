@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'ui/keyboard_layout.dart';
+import 'ui/ghost_keyboard_view.dart';
 
 void main() {
   runApp(const KeyboardMain());
@@ -15,7 +15,7 @@ class KeyboardMain extends StatelessWidget {
       home: Scaffold(
         backgroundColor: Colors.transparent,
         body: SafeArea(
-          child: KeyboardLayout(),
+          child: GhostKeyboardView(),
         ),
       ),
     );

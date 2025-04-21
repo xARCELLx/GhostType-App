@@ -1,41 +1,49 @@
 import 'package:flutter/material.dart';
 
-class KeyboardLayout extends StatelessWidget {
+class GhostKeyboardView extends StatelessWidget {
   final List<String> _keysRow1 = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'];
   final List<String> _keysRow2 = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'];
   final List<String> _keysRow3 = ['Z', 'X', 'C', 'V', 'B', 'N', 'M'];
 
-  KeyboardLayout({super.key});
+  GhostKeyboardView({super.key});
+
+  void _onKeyPressed(String key) {
+    // TODO: Send key to native using platform channel
+    debugPrint("Pressed: $key");
+  }
 
   Widget _buildKey(String key, {int flex = 1}) {
     return Expanded(
       flex: flex,
       child: Padding(
         padding: const EdgeInsets.all(2),
-        child: Container(
-          height: 48,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Colors.purple[800]!.withOpacity(0.15),
-                Colors.purple[500]!.withOpacity(0.05),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+        child: GestureDetector(
+          onTap: () => _onKeyPressed(key),
+          child: Container(
+            height: 48,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.purple[800]!.withOpacity(0.15),
+                  Colors.purple[500]!.withOpacity(0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: Colors.purple[300]!.withOpacity(0.2),
+                width: 0.4,
+              ),
             ),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: Colors.purple[300]!.withOpacity(0.2),
-              width: 0.4,
-            ),
-          ),
-          child: Center(
-            child: Text(
-              key,
-              style: TextStyle(
-                color: Colors.purple[100],
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
+            child: Center(
+              child: Text(
+                key,
+                style: TextStyle(
+                  color: Colors.purple[100],
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ),
